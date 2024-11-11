@@ -102,17 +102,17 @@ int get_neigh(char field[][X_AXIS], int x, int y) {
 	neigh += get_cell(field, x, y + 1) + get_cell(field, x + 1, y) +
 	    get_cell(field, x + 1, y + 1);
 
-    // BL corner: x=0 y=Y_AXIS
+    // BL corner: x=0 y=Y_AXIS-1
     } else if (x == 0 && y == Y_AXIS - 1) {
 	neigh += get_cell(field, x, y - 1) + get_cell(field, x + 1, y) +
 	    get_cell(field, x + 1, y - 1);
 
-    // UR corner: x=X_AXIS - 1 y=0
+    // UR corner: x=X_AXIS-1 y=0
     } else if (x == X_AXIS * 8 - 1 && y == 0) {
 	neigh += get_cell(field, x, y + 1) + get_cell(field, x - 1, y) +
 	    get_cell(field, x - 1, y + 1);
 
-    // BR corner: x=X_AXIS y=Y_AXIS
+    // BR corner: x=X_AXIS-1 y=Y_AXIS-1
     } else if (x == X_AXIS * 8 - 1 && y == Y_AXIS - 1) {
 	neigh += get_cell(field, x, y - 1) + get_cell(field, x - 1, y) +
 	    get_cell(field, x - 1, y - 1);
@@ -129,7 +129,7 @@ int get_neigh(char field[][X_AXIS], int x, int y) {
 	    get_cell(field, x + 1, y - 1) + get_cell(field, x + 1, y) +
 	    get_cell(field, x + 1, y + 1);
 
-    // RS: x=X_AXIS - 1 y=1:Y_AXIS-2
+    // RS: x=X_AXIS-1 y=1:Y_AXIS-2
     } else if ((y > 0) && (y < Y_AXIS - 1) && (x == X_AXIS * 8 - 1)) {
 	neigh += get_cell(field, x - 1, y) + get_cell(field, x, y - 1) +
 	    get_cell(field, x - 1, y - 1) + get_cell(field, x - 1, y + 1) +
@@ -141,6 +141,7 @@ int get_neigh(char field[][X_AXIS], int x, int y) {
 	    get_cell(field, x, y - 1) + get_cell(field, x + 1, y - 1) +
 	    get_cell(field, x + 1, y);
 
+    // any inner cell: x=1:X_AXIS-2 y=1:Y_AXIS-2
     } else {
     neigh += get_cell(field, x - 1, y - 1) + get_cell(field, x - 1, y) +
 	get_cell(field, x - 1, y + 1) + get_cell(field, x, y - 1) +
@@ -164,7 +165,7 @@ void iter_gen(char field[][X_AXIS]) {
     }
 
     for (int i = 0; i < Y_AXIS * X_AXIS * 8; i++) {
-	int cell;
+	char cell;
 	cell = neigh_array[i];
 
 	// dead cell
@@ -181,7 +182,7 @@ void iter_gen(char field[][X_AXIS]) {
 	    if (cell > 13) {
 		die(field, i % (X_AXIS * 8), i / (X_AXIS * 8));
 	}
-	    // live cell with 2 to 3 neighs (11 < cell < 14) remain
+	    // live cells with 2 to 3 neighs (11 < cell < 14) remain
     }
 }
 
