@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <unistd.h>
 
+
 #define X_AXIS 20
 #define Y_AXIS 30
 #define DEAD_CELL 46
 #define LIVE_CELL 35
+
 
 int pow2(int exp);
 int get_cell(char field[][X_AXIS], int x, int y);
@@ -20,6 +22,7 @@ struct Index {
     int j;
 };
 
+
 int pow2(int exp) {
     if (exp == 0)
 	return 1;
@@ -32,6 +35,7 @@ int pow2(int exp) {
     }
 }
 
+
 struct Index map(int x, int y) {
     struct Index index;
     
@@ -40,6 +44,7 @@ struct Index map(int x, int y) {
 
     return index;
 }
+
 
 int get_cell(char field[][X_AXIS], int x, int y) {
     char conj;
@@ -52,6 +57,7 @@ int get_cell(char field[][X_AXIS], int x, int y) {
 	return 1;
     return 0;
 }
+
 
 int set_cell(char field[][X_AXIS], int x, int y, int bit) {
     struct Index index;
@@ -66,7 +72,6 @@ int set_cell(char field[][X_AXIS], int x, int y, int bit) {
     } else {
 	field[index.i][index.j] += pow2(7 - x % 8);
     }
-
     return bit;
 }
 
@@ -93,6 +98,7 @@ void print_field(char field[][X_AXIS]) {
 	putchar('\n');
     }
 }
+
 
 int get_neigh(char field[][X_AXIS], int x, int y) {
     int neigh = 0;
@@ -150,6 +156,7 @@ int get_neigh(char field[][X_AXIS], int x, int y) {
     }
     return neigh;
 }
+
 
 void iter_gen(char field[][X_AXIS]) {
     char neigh_array[Y_AXIS * X_AXIS * 8] = {0};
