@@ -8,7 +8,6 @@
 #define LIVE_CELL 35
 
 
-int pow2(int exp);
 int get_cell(char field[][X_AXIS], int x, int y);
 int set_cell(char field[][X_AXIS], int x, int y, int bit);
 int get_neigh(char field[][X_AXIS], int x, int y);
@@ -21,19 +20,6 @@ struct Index {
     int i;
     int j;
 };
-
-
-int pow2(int exp) {
-    if (exp == 0)
-	return 1;
-    if (exp < 0)
-	return -1;
-    if (exp == 1) {
-	return 2;
-    } else {
-	return 2 * pow2(exp - 1);
-    }
-}
 
 
 struct Index map(int x, int y) {
@@ -51,7 +37,7 @@ int get_cell(char field[][X_AXIS], int x, int y) {
     struct Index index;
 
     index = map(x, y);
-    conj = field[index.i][index.j] & pow2(7 - x % 8);
+    conj = field[index.i][index.j] & 1 << (7 - x % 8);
 
     if (conj != 0)
 	return 1;
@@ -68,9 +54,9 @@ int set_cell(char field[][X_AXIS], int x, int y, int bit) {
 	return -1;
 
     if (bit == 0) {
-	field[index.i][index.j] -= pow2(7 - x % 8);
+	field[index.i][index.j] -= 1 << (7 - x % 8);
     } else {
-	field[index.i][index.j] += pow2(7 - x % 8);
+	field[index.i][index.j] += 1 << (7 - x % 8);
     }
     return bit;
 }
