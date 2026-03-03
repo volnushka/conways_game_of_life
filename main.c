@@ -24,7 +24,18 @@ struct Index {
 
 struct Index map(int x, int y) {
     struct Index index;
-    
+    if (x > X_AXIS * 8 - 1) {
+        x = 0;
+    }
+    if (y > Y_AXIS - 1) {
+        y = 0;
+    }
+    if (x < 0) {
+        x = X_AXIS * 8 - 1;
+    }
+    if (y < 0) {
+        y = Y_AXIS - 1;
+    }
     index.i = y;
     index.j = x / 8;
 
@@ -88,58 +99,7 @@ void print_field(char field[][X_AXIS]) {
 
 int get_neigh(char field[][X_AXIS], int x, int y) {
     int neigh = 0;
-
-    // UL corner: x=0 y=0
-    if (x == 0 && y == 0) {
-	neigh += get_cell(field, x, y + 1) + get_cell(field, x + 1, y) +
-	    get_cell(field, x + 1, y + 1);
-
-    // BL corner: x=0 y=Y_AXIS-1
-    } else if (x == 0 && y == Y_AXIS - 1) {
-	neigh += get_cell(field, x, y - 1) + get_cell(field, x + 1, y) +
-	    get_cell(field, x + 1, y - 1);
-
-    // UR corner: x=X_AXIS-1 y=0
-    } else if (x == X_AXIS * 8 - 1 && y == 0) {
-	neigh += get_cell(field, x, y + 1) + get_cell(field, x - 1, y) +
-	    get_cell(field, x - 1, y + 1);
-
-    // BR corner: x=X_AXIS-1 y=Y_AXIS-1
-    } else if (x == X_AXIS * 8 - 1 && y == Y_AXIS - 1) {
-	neigh += get_cell(field, x, y - 1) + get_cell(field, x - 1, y) +
-	    get_cell(field, x - 1, y - 1);
-
-    // US: x=1:X_AXIS-2 y=0
-    } else if (y == 0 && (x > 0) && (x < X_AXIS * 8 - 1)) {
-	neigh += get_cell(field, x - 1, y) + get_cell(field, x + 1, y) +
-	    get_cell(field, x - 1, y + 1) + get_cell(field, x, y + 1) +
-	    get_cell(field, x + 1, y + 1);
-
-    // LS: x=0 y=1:Y_AXIS-2
-    } else if ((y > 0 && y < Y_AXIS - 1) && x == 0) {
-	neigh += get_cell(field, x, y - 1) + get_cell(field, x, y + 1) +
-	    get_cell(field, x + 1, y - 1) + get_cell(field, x + 1, y) +
-	    get_cell(field, x + 1, y + 1);
-
-    // RS: x=X_AXIS-1 y=1:Y_AXIS-2
-    } else if ((y > 0) && (y < Y_AXIS - 1) && (x == X_AXIS * 8 - 1)) {
-	neigh += get_cell(field, x - 1, y) + get_cell(field, x, y - 1) +
-	    get_cell(field, x - 1, y - 1) + get_cell(field, x - 1, y + 1) +
-	    get_cell(field, x, y + 1);
-
-    // BS: x=1:X_AXIS-2 y=Y_AXIS-1
-    } else if (y == (Y_AXIS - 1) && (x > 0) && (x < X_AXIS * 8 - 1)) {
-	neigh += get_cell(field, x - 1, y) + get_cell(field, x - 1, y - 1) +
-	    get_cell(field, x, y - 1) + get_cell(field, x + 1, y - 1) +
-	    get_cell(field, x + 1, y);
-
-    // any inner cell: x=1:X_AXIS-2 y=1:Y_AXIS-2
-    } else {
-    neigh += get_cell(field, x - 1, y - 1) + get_cell(field, x - 1, y) +
-	get_cell(field, x - 1, y + 1) + get_cell(field, x, y - 1) +
-	get_cell(field, x, y + 1) + get_cell(field, x + 1, y - 1) +
-	get_cell(field, x + 1, y) + get_cell(field, x + 1, y + 1);
-    }
+    neigh += get_cell(field, x - 1, y - 1) + get_cell(field, x, y - 1) + get_cell(field, x + 1, y - 1) + get_cell(field, x + 1, y) + get_cell(field, x + 1, y + 1) + get_cell(field, x, y + 1) + get_cell(field, x - 1, y + 1) + get_cell(field, x - 1, y);
     return neigh;
 }
 
@@ -187,30 +147,6 @@ void main() {
     spawn(field, 9, 3);
     spawn(field, 10, 3);
     spawn(field, 11, 3);
-    
-    spawn(field, 15, 6);
-    spawn(field, 16, 7);
-    spawn(field, 14, 8);
-    spawn(field, 15, 8);
-    spawn(field, 16, 8);
-
-    spawn(field, 40, 10);
-    spawn(field, 40, 11);
-    spawn(field, 39, 11);
-    spawn(field, 40, 12);
-    spawn(field, 41, 12);
-
-    spawn(field, 90, 20);
-    spawn(field, 92, 20);
-    spawn(field, 92, 19);
-    spawn(field, 94, 18);
-    spawn(field, 94, 17);
-    spawn(field, 94, 16);
-    spawn(field, 96, 17);
-    spawn(field, 96, 16);
-    spawn(field, 96, 15);
-    spawn(field, 97, 16);
-
     print_field(field);
     sleep(1);
     for (int i = 0; i < 1000; i++) {
