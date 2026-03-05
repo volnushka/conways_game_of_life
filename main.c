@@ -2,28 +2,30 @@
 #include <unistd.h>
 
 
-#define X_AXIS 20
-#define Y_AXIS 30
+#define X_AXIS 23
+#define Y_AXIS 43
 #define DEAD_CELL 46
 #define LIVE_CELL 35
 
 
-int get_cell(char field[][X_AXIS], int x, int y);
-int set_cell(char field[][X_AXIS], int x, int y, int bit);
-int get_neigh(char field[][X_AXIS], int x, int y);
-int spawn(char field[][X_AXIS], int x, int y);
-int die(char field[][X_AXIS], int x, int y);
+char get_cell(char field[][X_AXIS], int x, int y);
+char set_cell(char field[][X_AXIS], int x, int y, char bit);
+char get_neigh(char field[][X_AXIS], int x, int y);
+char spawn(char field[][X_AXIS], int x, int y);
+char die(char field[][X_AXIS], int x, int y);
 void print_field(char field[][X_AXIS]);
 void iter_gen(char field[][X_AXIS]);
 
 struct Index {
     int i;
     int j;
+    char k;
 };
 
 
 struct Index map(int x, int y) {
     struct Index index;
+
     if (x > X_AXIS * 8 - 1) {
         x = 0;
     }
@@ -38,25 +40,28 @@ struct Index map(int x, int y) {
     }
     index.i = y;
     index.j = x / 8;
+    index.k = x % 8;
 
     return index;
 }
 
 
-int get_cell(char field[][X_AXIS], int x, int y) {
-    char conj;
+char get_cell(char field[][X_AXIS], int x, int y) {
+    char conj, value;
     struct Index index;
 
     index = map(x, y);
-    conj = field[index.i][index.j] & 1 << (7 - x % 8);
+    conj = field[index.i][index.j] & 1 << (7 - index.k);
 
-    if (conj != 0)
-	return 1;
-    return 0;
+    if (conj == 0)
+	value = 0;
+    else
+        value = 1;
+    return value;
 }
 
 
-int set_cell(char field[][X_AXIS], int x, int y, int bit) {
+char set_cell(char field[][X_AXIS], int x, int y, char bit) {
     struct Index index;
 
     index = map(x, y);
@@ -64,21 +69,22 @@ int set_cell(char field[][X_AXIS], int x, int y, int bit) {
     if (get_cell(field, x, y) == bit)
 	return -1;
 
+    char modifier = 1 << (7 - index.k);
     if (bit == 0) {
-	field[index.i][index.j] -= 1 << (7 - x % 8);
+	field[index.i][index.j] = field[index.i][index.j] & ~modifier;
     } else {
-	field[index.i][index.j] += 1 << (7 - x % 8);
+	field[index.i][index.j] = field[index.i][index.j] | modifier;
     }
     return bit;
 }
 
 
-int spawn(char field[][X_AXIS], int x, int y) {
+char spawn(char field[][X_AXIS], int x, int y) {
     return set_cell(field, x, y, 1);
 }
 
 
-int die(char field[][X_AXIS], int x, int y) {
+char die(char field[][X_AXIS], int x, int y) {
     return set_cell(field, x, y, 0);
 }
 
@@ -97,9 +103,16 @@ void print_field(char field[][X_AXIS]) {
 }
 
 
-int get_neigh(char field[][X_AXIS], int x, int y) {
-    int neigh = 0;
-    neigh += get_cell(field, x - 1, y - 1) + get_cell(field, x, y - 1) + get_cell(field, x + 1, y - 1) + get_cell(field, x + 1, y) + get_cell(field, x + 1, y + 1) + get_cell(field, x, y + 1) + get_cell(field, x - 1, y + 1) + get_cell(field, x - 1, y);
+char get_neigh(char field[][X_AXIS], int x, int y) {
+    char neigh = 0;
+    neigh += get_cell(field, x - 1, y - 1) + 
+        get_cell(field, x, y - 1) + 
+        get_cell(field, x + 1, y - 1) + 
+        get_cell(field, x + 1, y) + 
+        get_cell(field, x + 1, y + 1) + 
+        get_cell(field, x, y + 1) + 
+        get_cell(field, x - 1, y + 1) + 
+        get_cell(field, x - 1, y);
     return neigh;
 }
 
@@ -140,16 +153,36 @@ void iter_gen(char field[][X_AXIS]) {
 }
 
 
-void main() {
+int main() {
     char field[Y_AXIS][X_AXIS] = {{0}, {0}};
     spawn(field, 10, 1);
     spawn(field, 11, 2);
     spawn(field, 9, 3);
     spawn(field, 10, 3);
     spawn(field, 11, 3);
+    spawn(field, 15, 6);
+    spawn(field, 16, 7);
+    spawn(field, 14, 8);
+    spawn(field, 15, 8);
+    spawn(field, 16, 8);
+    spawn(field, 40, 10);
+    spawn(field, 40, 11);
+    spawn(field, 39, 11);
+    spawn(field, 40, 12);
+    spawn(field, 41, 12);
+    spawn(field, 90, 20);
+    spawn(field, 92, 20);
+    spawn(field, 92, 19);
+    spawn(field, 94, 18);
+    spawn(field, 94, 17);
+    spawn(field, 94, 16);
+    spawn(field, 96, 17);
+    spawn(field, 96, 16);
+    spawn(field, 96, 15);
+    spawn(field, 97, 16);
     print_field(field);
     sleep(1);
-    for (int i = 0; i < 1000; i++) {
+    while (1) {
 	printf("\e[1;1H\e[2J");
 	iter_gen(field);
 	print_field(field);
