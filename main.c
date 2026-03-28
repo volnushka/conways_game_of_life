@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <unistd.h>
+#define _DEFAULT_SOURCE
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #define X_AXIS 23
 #define Y_AXIS 43
@@ -8,11 +10,11 @@
 #define LIVE_CELL 35
 
 
-char get_cell(char field[][X_AXIS], int x, int y);
-char set_cell(char field[][X_AXIS], int x, int y, char bit);
+bool get_cell(char field[][X_AXIS], int x, int y);
+bool set_cell(char field[][X_AXIS], int x, int y, bool bit);
+bool spawn(char field[][X_AXIS], int x, int y);
+bool die(char field[][X_AXIS], int x, int y);
 char get_neigh(char field[][X_AXIS], int x, int y);
-char spawn(char field[][X_AXIS], int x, int y);
-char die(char field[][X_AXIS], int x, int y);
 void print_field(char field[][X_AXIS]);
 void iter_gen(char field[][X_AXIS]);
 
@@ -46,31 +48,27 @@ struct Index map(int x, int y) {
 }
 
 
-char get_cell(char field[][X_AXIS], int x, int y) {
-    char conj, value;
+bool get_cell(char field[][X_AXIS], int x, int y) {
+    char conj;
     struct Index index;
 
     index = map(x, y);
     conj = field[index.i][index.j] & 1 << (7 - index.k);
 
     if (conj == 0)
-	value = 0;
+	return false;
     else
-        value = 1;
-    return value;
+        return true;
 }
 
 
-char set_cell(char field[][X_AXIS], int x, int y, char bit) {
+bool set_cell(char field[][X_AXIS], int x, int y, bool bit) {
     struct Index index;
 
     index = map(x, y);
     
-    if (get_cell(field, x, y) == bit)
-	return -1;
-
     char modifier = 1 << (7 - index.k);
-    if (bit == 0) {
+    if (bit == false) {
 	field[index.i][index.j] = field[index.i][index.j] & ~modifier;
     } else {
 	field[index.i][index.j] = field[index.i][index.j] | modifier;
@@ -79,20 +77,20 @@ char set_cell(char field[][X_AXIS], int x, int y, char bit) {
 }
 
 
-char spawn(char field[][X_AXIS], int x, int y) {
-    return set_cell(field, x, y, 1);
+bool spawn(char field[][X_AXIS], int x, int y) {
+    return set_cell(field, x, y, true);
 }
 
 
-char die(char field[][X_AXIS], int x, int y) {
-    return set_cell(field, x, y, 0);
+bool die(char field[][X_AXIS], int x, int y) {
+    return set_cell(field, x, y, false);
 }
 
 
 void print_field(char field[][X_AXIS]) {
     for (int i = 0; i < Y_AXIS; i++) {
 	for (int j = 0; j < X_AXIS * 8; j++) {
-	    if (get_cell(field, j, i) == 0) {
+	    if (get_cell(field, j, i) == false) {
 		putchar(DEAD_CELL);
 	    } else {
 		putchar(LIVE_CELL);
@@ -181,7 +179,7 @@ int main() {
     spawn(field, 96, 15);
     spawn(field, 97, 16);
     print_field(field);
-    sleep(1);
+    sleep(5);
     while (1) {
 	printf("\e[1;1H\e[2J");
 	iter_gen(field);
